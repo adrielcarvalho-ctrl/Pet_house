@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Pet - Plataforma de Adoção</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">🐾 House Pet</div>
+            <div class="header-buttons">
+                <span id="userInfo" class="user-info hidden"></span>
+                <button id="loginBtn" class="btn btn-secondary">Entrar</button>
+                <button id="addPetBtn" class="btn btn-primary hidden">Cadastrar Pet</button>
+                <button id="logoutBtn" class="btn btn-secondary hidden">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="intro">
+            <h2>Encontre seu novo melhor amigo</h2>
+            <p id="petCount">Carregando pets disponíveis...</p>
+        </div>
+
+        <div class="filters">
+            <h3>Filtros</h3>
+            <div class="filter-grid">
+                <!-- INCLUÍDO: Busca Textual por Nome (RF09) -->
+                <div class="filter-group">
+                    <label for="searchName">Buscar por Nome</label>
+                    <input type="text" id="searchName" placeholder="Qual o nome do pet?">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterType">Tipo de Animal</label>
+                    <select id="filterType">
+                        <option value="">Todos</option>
+                        <option value="cachorro">Cachorro</option>
+                        <option value="gato">Gato</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterAge">Idade</label>
+                    <select id="filterAge">
+                        <option value="">Todas</option>
+                        <option value="filhote">Filhote</option>
+                        <option value="adulto">Adulto</option>
+                        <option value="idoso">Idoso</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterSize">Porte</label>
+                    <select id="filterSize">
+                        <option value="">Todos</option>
+                        <option value="pequeno">Pequeno</option>
+                        <option value="medio">Médio</option>
+                        <option value="grande">Grande</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filterLocation">Localização</label>
+                    <!-- INCLUÍDO: Contexto Local de Palmas -->
+                    <input type="text" id="filterLocation" placeholder="Ex: Palmas - TO (Aureny, etc.)">
+                </div>
+            </div>
+        </div>
+
+        <div id="petsGrid" class="pets-grid"></div>
+        <div id="noResults" class="no-results hidden">
+            Nenhum pet encontrado com os filtros selecionados.
+        </div>
+    </main>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Login</h3>
+                <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <div id="loginError" class="error-message hidden"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Entrar</button>
+            </form>
+            <div class="switch-form">
+                Não tem uma conta? <a onclick="switchToRegister()">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cadastro</h3>
+                <button class="close-btn" onclick="closeRegisterModal()">&times;</button>
+            </div>
+            <div id="registerError" class="error-message hidden"></div>
+            <div id="registerSuccess" class="success-message hidden"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="registerName">Nome Completo</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Senha</label>
+                    <input type="password" id="registerPassword" minlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirmar Senha</label>
+                    <input type="password" id="registerConfirmPassword" minlength="6" required>
+                </div>
+                
+                <!-- INCLUÍDO: Checkboxes de Preferência de Contato (RF01) -->
+                <div class="form-group">
+                    <label for="registerPhone">Telefone</label>
+                    <input type="tel" id="registerPhone" placeholder="(63) 90000-0000">
+                </div>
+                <div class="form-group checkbox-group" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div>
+                        <input type="checkbox" id="acceptWhatsapp">
+                        <label for="acceptWhatsapp" style="font-weight: normal; display: inline;">WhatsApp</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="acceptCall">
+                        <label for="acceptCall" style="font-weight: normal; display: inline;">Ligação</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Cadastrar</button>
+            </form>
+            <div class="switch-form">
+                Já tem uma conta? <a onclick="switchToLogin()">Faça login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Adicionar Pet -->
+    <div id="addPetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cadastrar Pet para Adoção</h3>
+                <button class="close-btn" onclick="closeAddPetModal()">&times;</button>
+            </div>
+            <form id="addPetForm">
+                <div class="form-group">
+                    <label for="petName">Nome</label>
+                    <input type="text" id="petName" required>
+                </div>
+                <div class="form-group">
+                    <label for="petType">Tipo</label>
+                    <select id="petType" required>
+                        <option value="">Selecione</option>
+                        <option value="cachorro">Cachorro</option>
+                        <option value="gato">Gato</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="petAge">Idade</label>
+                    <select id="petAge" required>
+                        <option value="">Selecione</option>
+                        <option value="filhote">Filhote</option>
+                        <option value="adulto">Adulto</option>
+                        <option value="idoso">Idoso</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="petSize">Porte</label>
+                    <select id="petSize" required>
+                        <option value="">Selecione</option>
+                        <option value="pequeno">Pequeno</option>
+                        <option value="medio">Médio</option>
+                        <option value="grande">Grande</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="petGender">Gênero</label>
+                    <select id="petGender" required>
+                        <option value="">Selecione</option>
+                        <option value="macho">Macho</option>
+                        <option value="femea">Fêmea</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="petLocation">Localização</label>
+                    <input type="text" id="petLocation" required placeholder="Ex: Aureny III, Palmas">
+                </div>
+                <div class="form-group">
+                    <label for="petImage">URL da Imagem</label>
+                    <input type="url" id="petImage" required placeholder="Cole o link da foto aqui">
+                </div>
+                <div class="form-group">
+                    <label for="petDescription">Descrição</label>
+                    <textarea id="petDescription" required placeholder="Conte um pouco sobre o animal..."></textarea>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="petVaccinated">
+                    <label for="petVaccinated">Vacinado</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="petNeutered">
+                    <label for="petNeutered">Castrado</label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Cadastrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes do Pet -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detailName"></h3>
+                <button class="close-btn" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <img id="detailImage" class="pet-detail-image" src="" alt="">
+            <div class="pet-detail-info">
+                <div class="info-row">
+                    <span class="info-label">Tipo</span>
+                    <span id="detailType" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Idade</span>
+                    <span id="detailAge" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Porte</span>
+                    <span id="detailSize" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Gênero</span>
+                    <span id="detailGender" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Localização</span>
+                    <span id="detailLocation" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Vacinado</span>
+                    <span id="detailVaccinated" class="info-value"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Castrado</span>
+                    <span id="detailNeutered" class="info-value"></span>
+                </div>
+            </div>
+            <p id="detailDescription" style="margin-top: 1rem; color: #374151; line-height: 1.5;"></p>
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="adoptPet()">Quero Adotar!</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
